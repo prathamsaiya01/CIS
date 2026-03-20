@@ -18,7 +18,7 @@ def show_splash(root, next_screen_callback):
     splash.overrideredirect(True)
 
     # Load Logo
-    logo_path = os.path.join("assets", "logo.png")
+    logo_path = os.path.join("assets", "images", "logo.png")
     img = Image.open(logo_path)
     img = img.resize((200, 200))
     logo = ImageTk.PhotoImage(img)
