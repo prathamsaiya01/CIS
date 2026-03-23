@@ -1,6 +1,4 @@
-<<<<<<< HEAD
-=======
-from database.db import connect_db
+from Database.db import connect_db
 
 def signup(username, password, avatar):
     conn = connect_db()
@@ -19,8 +17,10 @@ def signup(username, password, avatar):
         conn.close()
 
 
->>>>>>> fb7855b8f66b1a487003ea679eeffb4acf2fc5e6
 def login(username, password):
+    if not username or not password:
+        return None
+
     conn = connect_db()
     cursor = conn.cursor()
 
