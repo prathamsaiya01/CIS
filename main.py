@@ -1,12 +1,13 @@
 import tkinter as tk
 from ui.splash import show_splash
-
-def open_login():
-    print("Go to Login Screen")  # we’ll replace later
+from ui.login import open_login
+from Database.db import create_tables
 
 root = tk.Tk()
-root.withdraw()  # hide main window
+root.withdraw()
 
-show_splash(root, open_login)
+create_tables()   # 🔥 important
+
+show_splash(root, lambda: open_login(root))
 
 root.mainloop()
