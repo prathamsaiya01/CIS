@@ -1,5 +1,5 @@
 import tkinter as tk
-
+from ui.game import start_game
 def open_role_select(root, username):
 
     role_window = tk.Toplevel(root)
@@ -34,7 +34,8 @@ def open_role_select(root, username):
     def choose_investigator():
         print("Investigator Selected")
         role_window.destroy()
-
+        start_game()
+        
     def choose_criminal():
         print("Criminal Selected")
         role_window.destroy()
