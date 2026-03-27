@@ -1,11 +1,14 @@
 import tkinter as tk
 from tkinter import messagebox
 from Database.auth import signup
+import winsound
+
+
+def play_click():
+    winsound.Beep(900, 80)
 
 
 def open_signup(root):
-
-    # Clear screen
     for widget in root.winfo_children():
         widget.destroy()
 
@@ -13,12 +16,11 @@ def open_signup(root):
     root.geometry("700x500")
     root.configure(bg="#020617")
 
-    # Center window
-    x = (root.winfo_screenwidth() // 2) - (700 // 2)
-    y = (root.winfo_screenheight() // 2) - (500 // 2)
+    x = (root.winfo_screenwidth() // 2) - 350
+    y = (root.winfo_screenheight() // 2) - 250
     root.geometry(f"700x500+{x}+{y}")
 
-    # ===== TITLE =====
+    # TITLE
     tk.Label(
         root,
         text="CIS",
@@ -33,75 +35,68 @@ def open_signup(root):
         font=("Consolas", 12),
         fg="#22c55e",
         bg="#020617"
-    ).pack(pady=5)
+    ).pack()
 
-    # ===== CARD FRAME =====
-    card = tk.Frame(root, bg="#0f172a", bd=2)
-    card.pack(pady=40, padx=50, fill="both", expand=False)
+    # CARD
+    card = tk.Frame(root, bg="#0f172a")
+    card.pack(pady=40, padx=50)
 
-    # ===== USERNAME =====
     tk.Label(card, text="Agent ID", fg="white", bg="#0f172a").pack(pady=10)
-
-    username_entry = tk.Entry(
-        card,
-        font=("Consolas", 12),
-        bg="#1e293b",
-        fg="white",
-        insertbackground="white",
-        width=25
-    )
+    username_entry = tk.Entry(card, font=("Consolas", 12), bg="#1e293b", fg="white")
     username_entry.pack(ipady=5)
 
-    # ===== PASSWORD =====
     tk.Label(card, text="Security Key", fg="white", bg="#0f172a").pack(pady=10)
-
-    password_entry = tk.Entry(
-        card,
-        font=("Consolas", 12),
-        show="*",
-        bg="#1e293b",
-        fg="white",
-        insertbackground="white",
-        width=25
-    )
+    password_entry = tk.Entry(card, font=("Consolas", 12), show="*", bg="#1e293b", fg="white")
     password_entry.pack(ipady=5)
 
-    # ===== STATUS =====
-    status_label = tk.Label(card, text="", fg="yellow", bg="#0f172a")
-    status_label.pack(pady=10)
+    status = tk.Label(card, text="", bg="#0f172a", fg="yellow")
+    status.pack(pady=10)
 
-    # ===== SIGNUP FUNCTION =====
     def handle_signup():
+        play_click()
+
         username = username_entry.get().strip()
         password = password_entry.get().strip()
 
         if not username or not password:
-            status_label.config(text="⚠ All fields required", fg="yellow")
+            status.config(text="⚠ All fields required", fg="yellow")
             return
 
         if signup(username, password, None):
-            status_label.config(text="✅ Account Created", fg="#22c55e")
+            status.config(text="✅ Account Created", fg="#22c55e")
             messagebox.showinfo("Success", "Agent Registered Successfully")
 
-            # Go back to login
-            root.after(1000, lambda: open_login(root))
+            def redirect():
+                from ui.login import open_login
+                open_login(root)
 
+            root.after(1000, redirect)
         else:
-            status_label.config(text="❌ Username already exists", fg="red")
+            status.config(text="❌ Username exists", fg="red")
 
-    # ===== BUTTONS =====
     btn_frame = tk.Frame(card, bg="#0f172a")
     btn_frame.pack(pady=20)
 
-    tk.Button(
+    register_btn = tk.Button(
         btn_frame,
         text="REGISTER",
         font=("Consolas", 12, "bold"),
-        bg="#22c55e",
-        fg="black",
-        width=15,
+        bg="#16a34a",
+        fg="white",
+        bd=0,
         command=handle_signup
-    ).grid(row=0, column=0, padx=10)
+    )
+    register_btn.grid(row=0, column=0, padx=10)
+
+    def hover_on(e): e.widget.config(bg="#22c55e")
+    def hover_off(e): e.widget.config(bg="#16a34a")
+
+    register_btn.bind("<Enter>", hover_on)
+    register_btn.bind("<Leave>", hover_off)
+
+    def go_back():
+        from ui.login import open_login
+        open_login(root)
 
     tk.Button(
         btn_frame,
@@ -110,5 +105,5 @@ def open_signup(root):
         bg="#020617",
         fg="#38bdf8",
         bd=0,
-        command=lambda: __import__('ui.login').login.open_login(root)
+        command=go_back
     ).grid(row=0, column=1, padx=10)
