@@ -51,12 +51,17 @@ def show_splash(root, next_screen_callback):
     progress.pack(pady=30)
 
     def load():
-        for i in range(101):
-            progress['value'] = i
-            splash.update_idletasks()
-            splash.after(20)
+        progress['value'] = 0
 
-        splash.destroy()
-        next_screen_callback()
+        def step():
+            value = progress['value']
+            if value < 100:    
+                progress['value'] = value + 1
+                splash.after(20, step)
+            else:
+                splash.destroy()
+                next_screen_callback()
+
+        step()
 
     splash.after(500, load)
