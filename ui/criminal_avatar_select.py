@@ -1,7 +1,7 @@
 import tkinter as tk
 from PIL import Image, ImageTk
 from Database.db import connect_db
-from ui.criminal import open_criminal
+from ui.criminal_game import start_criminal_game
 
 selected_avatar = None
 
@@ -115,7 +115,7 @@ def open_criminal_avatar_select(root, username):
         conn.close()
 
         window.destroy()
-        open_criminal(root, username)
+        start_criminal_game()
 
     tk.Button(
         window,

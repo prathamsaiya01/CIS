@@ -1,6 +1,6 @@
 import tkinter as tk
 from ui.avatar_select import open_avatar_select
-from ui.criminal_avatar_select import open_criminal_avatar_select   # 🔥 NEW
+from ui.criminal_avatar_select import open_criminal_avatar_select  
 
 def open_role_select(root, username):
 
