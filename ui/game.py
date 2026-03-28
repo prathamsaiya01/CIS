@@ -1,28 +1,76 @@
 import tkinter as tk
-from logic.puzzles import password_cracker, cipher_game
 from ui.cases.case1 import open_case1
 from ui.cases.case2 import open_case2
 from ui.cases.case3 import open_case3
 from ui.cases.case4 import open_case4
 
-    # ---------------- BUTTONS ----------------
- 
+
 def start_game():
     case_window = tk.Toplevel()
-    case_window.title("Select Case")
-    case_window.geometry("400x300")
+    case_window.title("CIS // Select Case")
+    case_window.geometry("500x400")
+    case_window.configure(bg="black")
 
-    tk.Label(case_window, text="Select a Case", font=("Arial", 16)).pack(pady=20)
+    # Center window
+    x = (case_window.winfo_screenwidth() // 2) - 250
+    y = (case_window.winfo_screenheight() // 2) - 200
+    case_window.geometry(f"500x400+{x}+{y}")
 
-    tk.Button(case_window, text="Case 1: Midnight Murder",
-              command=lambda: open_case1(case_window)).pack(pady=10)
+    # ===== TITLE =====
+    tk.Label(
+        case_window,
+        text="SELECT MISSION",
+        font=("Consolas", 22, "bold"),
+        fg="#00f5ff",
+        bg="black"
+    ).pack(pady=20)
 
-    tk.Button(case_window, text="Case 2: Bank Heist",
-              command=lambda: open_case2(case_window)).pack(pady=10)
+    tk.Label(
+        case_window,
+        text="> Choose your investigation case",
+        font=("Consolas", 11),
+        fg="#00ff9f",
+        bg="black"
+    ).pack()
 
-    tk.Button(case_window, text="Case 3: Cyber Attack",
-              command=lambda: open_case3(case_window)).pack(pady=10)
+    # ===== BUTTON STYLE =====
+    def create_button(text, command):
+        btn = tk.Button(
+            case_window,
+            text=text,
+            font=("Consolas", 12, "bold"),
+            bg="#020617",
+            fg="#00ff9f",
+            activebackground="#00f5ff",
+            activeforeground="black",
+            bd=1,
+            relief="solid",
+            width=28,
+            pady=5,
+            command=command
+        )
 
-    tk.Button(case_window, text="Case 4: Kidnapping",
-              command=lambda: open_case4(case_window)).pack(pady=10)
+        # Hover effect
+        def on_enter(e):
+            btn.config(bg="#00ff9f", fg="black")
 
+        def on_leave(e):
+            btn.config(bg="#020617", fg="#00ff9f")
+
+        btn.bind("<Enter>", on_enter)
+        btn.bind("<Leave>", on_leave)
+
+        btn.pack(pady=10)
+
+    # ===== CASE BUTTONS =====
+    create_button("▶ CASE 1: MIDNIGHT MURDER",
+                  lambda: open_case1(case_window))
+
+    create_button("▶ CASE 2: BANK HEIST",
+                  lambda: open_case2(case_window))
+
+    create_button("▶ CASE 3: CYBER ATTACK",
+                  lambda: open_case3(case_window))
+
+    create_button("▶ CASE 4: KIDNAPPING",
+                  lambda: open_case4(case_window))
