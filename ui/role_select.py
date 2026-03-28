@@ -1,10 +1,10 @@
 import tkinter as tk
 from ui.avatar_select import open_avatar_select
-from ui.criminal import open_criminal
+from ui.criminal_avatar_select import open_criminal_avatar_select   # 🔥 NEW
 
 def open_role_select(root, username):
 
-    # Clear screen instead of new window
+    # Clear screen
     for widget in root.winfo_children():
         widget.destroy()
 
@@ -34,7 +34,7 @@ def open_role_select(root, username):
         bg="#020617"
     ).pack(pady=10)
 
-    # ===== BUTTON FRAME =====
+    # ===== FRAME =====
     frame = tk.Frame(root, bg="#020617")
     frame.pack(pady=50)
 
@@ -47,7 +47,7 @@ def open_role_select(root, username):
 
     # ===== INVESTIGATOR =====
     def choose_investigator():
-        open_avatar_select(root, username)   # 🔥 GO TO AVATAR SCREEN
+        open_avatar_select(root, username)
 
     inv_btn = tk.Button(
         frame,
@@ -66,7 +66,7 @@ def open_role_select(root, username):
 
     # ===== CRIMINAL =====
     def choose_criminal():
-        open_criminal(root, username)   # 🔥 GO TO CRIMINAL MODE
+        open_criminal_avatar_select(root, username)   # 🔥 UPDATED FLOW
 
     crim_btn = tk.Button(
         frame,
