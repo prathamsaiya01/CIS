@@ -147,15 +147,19 @@ def start_bank(root):
     def step3():
         clear()
         type_log("> Vault Firewall Detected 🔐")
+        type_log("> Decrypt the admin password hash")
 
-        tk.Label(frame, text="Solve: 6 × 7 = ?",
-                 fg="#ff4d4d", bg="black").pack()
+        tk.Label(frame, text="MD5: 5f4dcc3b5aa765d61d8327deb882cf99",
+                 fg="#ff4d4d", bg="black", font=("Consolas", 10)).pack()
 
-        entry = tk.Entry(frame)
-        entry.pack()
+        tk.Label(frame, text="Hint: Most common default password",
+                 fg="#888888", bg="black", font=("Consolas", 9)).pack(pady=2)
+
+        entry = tk.Entry(frame, show="*", font=("Consolas", 10))
+        entry.pack(pady=5)
 
         def check():
-            if entry.get() == "42":
+            if entry.get().lower() == "password":
                 type_log("> Firewall bypassed ✔️")
                 update_progress(30)
             else:
