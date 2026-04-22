@@ -267,3 +267,4 @@ def start_theft(root):
                   command=lambda: start_theft(root)).pack(pady=10)
 
     step1()
+    
