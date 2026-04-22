@@ -9,6 +9,8 @@ evidence = 0
 alibi = 0
 risk_level = 0
 current_phase = 0
+timer_running = False
+timer_id = None
 
 # Color scheme - Blood & Darkness
 BG_DARK = "#0d0d0d"
@@ -27,8 +29,12 @@ def start_murder(root):
     risk_level = 0
     current_phase = 0
 
+    global timer_running, timer_id
     for w in root.winfo_children():
         w.destroy()
+
+    timer_running = False
+    timer_id = None
 
     root.configure(bg=BG_DARK)
 
@@ -91,6 +97,38 @@ def start_murder(root):
                       fg=BLOOD_BRIGHT, bg=BG_PANEL,
                       font=("Courier New", 11, "bold"))
     status_label.pack(pady=8)
+
+    timer_label = tk.Label(root, text="⏱️ TIME PRESSURE: NONE", fg="#ffff66", bg=BG_DARK,
+                           font=("Courier New", 11, "bold"))
+    timer_label.pack(pady=(0, 10))
+
+    def cancel_timer():
+        global timer_running, timer_id
+        timer_running = False
+        if timer_id is not None:
+            root.after_cancel(timer_id)
+            timer_id = None
+        timer_label.config(text="⏱️ TIME PRESSURE: NONE", fg="#ffff66")
+
+    def start_timer(seconds, timeout, urgent=False):
+        global timer_running, timer_id
+        cancel_timer()
+        timer_running = True
+
+        def count(sec):
+            global timer_running, timer_id
+            if not timer_running:
+                return
+            if sec <= 0:
+                timer_running = False
+                timer_id = None
+                timeout()
+                return
+            color = "#ff4500" if urgent or sec < 6 else "#ffff66"
+            timer_label.config(text=f"⏱️ TIME PRESSURE: {sec}s", fg=color)
+            timer_id = root.after(1000, lambda: count(sec-1))
+
+        count(seconds)
 
     def update_stats(s=0, e=0, a=0, r=0):
         global suspicion, evidence, alibi, risk_level
@@ -330,6 +368,7 @@ def start_murder(root):
     # ===== PHASE 3: LOGICAL CHALLENGES =====
     def phase3():
         clear_content()
+        cancel_timer()
         type_log("")
         type_log("╔══════════════════════════════════════════╗", TEXT_GRAY)
         type_log("║  CHAPTER 2: THE SCENE                  ║", TEXT_GRAY)
@@ -338,7 +377,7 @@ def start_murder(root):
         type_log("It is done. Lord Whitmore lies still.")
         type_log("Now the real work begins. Every detail matters.")
         type_log("")
-        type_log("Answer correctly to minimize evidence and suspicion.", WARNING_ORANGE)
+        type_log("Answer each scenario before the house wakes. Every second costs you.", WARNING_ORANGE)
         
         # Challenge questions based on murder logic
         challenges = [
@@ -365,6 +404,18 @@ def start_murder(root):
                 "correct": 1,
                 "correct_text": "Smart. Small fires in fireplaces raise no eyebrows.",
                 "wrong_text": "Problematic. Missing rugs and cut fibers are obvious."
+            },
+            {
+                "q": "The guest's handwriting is on a note.\nHow do you alter it?",
+                "options": [
+                    ("Smudge it with water and grease", 10, 10),
+                    ("Burn the note after taking a photo", 5, 15),
+                    ("Leave the note untouched - plausible confusion", 20, 20),
+                    ("Replace it with a forged note", 15, 25)
+                ],
+                "correct": 1,
+                "correct_text": "Photos preserve evidence without leaving the original behind.",
+                "wrong_text": "Forged notes can be traced and incriminate you."
             },
             {
                 "q": "You need an alibi for the time of death.\nWho do you approach?",
@@ -402,13 +453,14 @@ def start_murder(root):
                 w.destroy()
             
             if current_challenge[0] >= len(challenges):
+                cancel_timer()
                 phase4()
                 return
             
             ch = challenges[current_challenge[0]]
             
             tk.Label(challenge_frame, 
-                    text=f"◄ EVIDENCE MANAGEMENT: SCENARIO {current_challenge[0]+1}/4 ►",
+                    text=f"◄ EVIDENCE MANAGEMENT: SCENARIO {current_challenge[0]+1}/{len(challenges)} ►",
                     font=("Courier New", 11, "bold"),
                     fg=WARNING_ORANGE, bg=BG_DARK).pack(pady=10)
             
@@ -433,7 +485,22 @@ def start_murder(root):
                               command=lambda i=idx, s=susp, e=evid: check_answer(i, s, e))
                 btn.pack(pady=5)
 
+            start_timer(12, auto_penalty, urgent=True)
+
+        def auto_penalty():
+            if current_challenge[0] >= len(challenges):
+                return
+            ch = challenges[current_challenge[0]]
+            type_log("\n⏳ TIME'S UP! Panic causes sloppy cleanup.", BLOOD_BRIGHT)
+            update_stats(s=15, e=20, a=0, r=20)
+            current_challenge[0] += 1
+            challenge_frame.after(1000, show_challenge)
+
         def check_answer(choice_idx, susp_penalty, evid_penalty):
+            global timer_running
+            if not timer_running:
+                return
+            cancel_timer()
             ch = challenges[current_challenge[0]]
             
             type_log("")
@@ -510,14 +577,22 @@ def start_murder(root):
             update_stats(s=20, e=15, a=0, r=25)
             type_log("The smell will surface in 48 hours. You must be gone by then.", WARNING_ORANGE)
         elif method == "pond":
+            cancel_timer()
             type_log("The water accepts its offering silently. Bubbles rise, then stop.", BLOOD_BRIGHT)
             update_stats(s=10, e=20, a=0, r=15)
             type_log("Water destroys DNA, but the body will float in 5-7 days.", "#00ff41")
         elif method == "fire":
-            type_log("The match strikes. You have 3 minutes to vacate before smoke rises.", BLOOD_BRIGHT)
+            type_log("The match strikes. You have 12 seconds to escape before the smoke alarm screams.", BLOOD_BRIGHT)
             update_stats(s=15, e=5, a=0, r=20)
             type_log("Accelerant traces remain. Arson investigators are thorough.", WARNING_ORANGE)
+            def fire_timeout():
+                type_log("\n🔥 SMOKE ALARM TRIGGERED! Arson is obvious now.", BLOOD_BRIGHT)
+                update_stats(s=25, e=30, a=0, r=30)
+                phase5()
+            start_timer(12, fire_timeout, urgent=True)
+            return
         else:
+            cancel_timer()
             type_log("You smash the window, overturn furniture, take the wallet.", BLOOD_BRIGHT)
             update_stats(s=5, e=30, a=0, r=15)
             type_log("Simple narrative, but your skin cells are everywhere.", WARNING_ORANGE)
